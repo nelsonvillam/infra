@@ -11,8 +11,28 @@ data:
     scrape_configs:
       - job_name: shop
         metrics_path: /actuator/prometheus
-        static_configs:
-          - targets: ["shop:80"]
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names: ["shop"]
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_label_app]
+            regex: shop
+            action: keep
+          - source_labels: [__meta_kubernetes_pod_phase]
+            regex: Pending|Succeeded|Failed|Unknown
+            action: drop
+          - source_labels: [__meta_kubernetes_pod_container_port_number]
+            regex: "8080"
+            action: keep
+          - source_labels: [__meta_kubernetes_pod_ip]
+            regex: (.+)
+            replacement: ${1}:8080
+            target_label: __address__
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: pod
+          - source_labels: [__meta_kubernetes_namespace]
+            target_label: namespace
 
       - job_name: gateway
         metrics_path: /actuator/prometheus

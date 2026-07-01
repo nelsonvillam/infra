@@ -17,6 +17,7 @@ resources:
   - redis/service.yaml
   - zipkin/deployment.yaml
   - zipkin/service.yaml
+  - prometheus/rbac.yaml
   - prometheus/configmap.yaml
   - prometheus/deployment.yaml
   - prometheus/service.yaml
